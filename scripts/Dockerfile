@@ -20,23 +20,18 @@ RUN apt-get update && apt-get install -y -qq --no-install-recommends \
   libreadline-dev=8.0-4 \
   && rm -rf /var/lib/apt/lists/*
 
-RUN git clone --depth 1 https://github.com/project-chip/connectedhomeip.git --branch v1.0.0 /opt/connectedhomeip \
-  && ./opt/connectedhomeip/scripts/checkout_submodules.py --shallow --platform linux \
-  && ./opt/connectedhomeip/scripts/build/gn_bootstrap.sh
+WORKDIR /opt
+RUN git clone --depth 1 https://github.com/project-chip/connectedhomeip.git --branch v1.0.0 \
+  && ./connectedhomeip/scripts/checkout_submodules.py --shallow --platform linux \
+  && ./connectedhomeip/scripts/build/gn_bootstrap.sh
 
-WORKDIR /opt/connectedhomeip/examples/chip-tool
-RUN source /opt/connectedhomeip/scripts/activate.sh \
-  && gn gen out/debug \
-  && ninja -C out/debug
-
-WORKDIR /opt/connectedhomeip/examples/lighting-app/linux
-RUN source /opt/connectedhomeip/scripts/activate.sh \
-  && gn gen out/debug \
-  && ninja -C out/debug
+WORKDIR /opt/connectedhomeip/scripts/examples/
+RUN ./gn_build_example.sh ../../examples/chip-tool /tmp/chip-tool/ \
+  && ./gn_build_example.sh ../../examples/lighting-app/linux /tmp/lighting-app/
 
 FROM ubuntu:20.04 as chip-tool
 
-COPY --from=builder /opt/connectedhomeip/examples/chip-tool/out/debug/chip-tool /usr/local/bin/
+COPY --from=builder /tmp/chip-tool /usr/local/bin/
 
 RUN apt-get update && apt-get install -y -qq --no-install-recommends \
   libssl-dev=1.1.1f-1ubuntu2.16 \
@@ -52,6 +47,6 @@ RUN apt-get update && apt-get install -y -qq --no-install-recommends \
   libdbus-1-dev=1.12.16-2ubuntu2.3 \
   && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /opt/connectedhomeip/examples/lighting-app/linux/out/debug/chip-lighting-app /usr/local/bin/
+COPY --from=builder /tmp/lighting-app /usr/local/bin/
 
 CMD ["/usr/local/bin/chip-lighting-app"]

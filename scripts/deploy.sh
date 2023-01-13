@@ -38,13 +38,21 @@ sudo docker-compose up -d
 trap 'sudo docker-compose down' EXIT
 _wait_chip_apps
 
-# Provisioning
-_exec_chip_tool pairing onnetwork-long 0x11 20202021 3840
+NODE_ID_TO_ASSIGN=0x11
+ENDPOINT_ID=1
+
+# Commissioning:
+# Discover devices with long discriminator 3840 and try to pair with the first
+# one it discovers using the provided setup code.
+_exec_chip_tool pairing onnetwork-long "${NODE_ID_TO_ASSIGN}" 20202021 3840
 
 # Light on
-_exec_chip_tool onoff on 0x11 1
+_exec_chip_tool onoff on "${NODE_ID_TO_ASSIGN}" "${ENDPOINT_ID}"
 
 # Light off
-_exec_chip_tool onoff off 0x11 1
+_exec_chip_tool onoff off "${NODE_ID_TO_ASSIGN}" "${ENDPOINT_ID}"
+
+# Forget the commissioned device
+_exec_chip_tool pairing unpair "${NODE_ID_TO_ASSIGN}"
 
 sudo docker-compose logs
