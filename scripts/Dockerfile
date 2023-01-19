@@ -2,7 +2,7 @@ FROM ubuntu:20.04 as builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && apt-get install -y -qq --no-install-recommends \
-  git=1:2.25.1-1ubuntu3.6 \
+  git=1:2.25.1-1ubuntu3.8 \
   gcc=4:9.3.0-1ubuntu2 \
   g++=4:9.3.0-1ubuntu2 \
   pkg-config=0.29.1-0ubuntu4 \
