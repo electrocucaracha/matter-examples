@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y -qq --no-install-recommends \
   ninja-build=1.10.0-1build1 \
   python3-venv=3.8.2-0ubuntu2 \
   python3-dev=3.8.2-0ubuntu2 \
-  python3-pip=20.0.2-5ubuntu1.6 \
+  python3-pip=20.0.2-5ubuntu1.7 \
   unzip=6.0-25ubuntu1.1 \
   libgirepository1.0-dev=1.64.1-1~ubuntu20.04.1 \
   libcairo2-dev=1.16.0-4ubuntu1 \
