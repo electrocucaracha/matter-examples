@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y -qq --no-install-recommends \
   gcc=4:9.3.0-1ubuntu2 \
   g++=4:9.3.0-1ubuntu2 \
   pkg-config=0.29.1-0ubuntu4 \
-  libssl-dev=1.1.1f-1ubuntu2.16 \
+  libssl-dev=1.1.1f-1ubuntu2.17 \
   libdbus-1-dev=1.12.16-2ubuntu2.3 \
   libglib2.0-dev=2.64.6-1~ubuntu20.04.4 \
   libavahi-client-dev=0.7-4ubuntu7.1 \
