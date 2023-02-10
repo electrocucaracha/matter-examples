@@ -15,6 +15,8 @@ if [[ ${DEBUG:-false} == "true" ]]; then
     set -o xtrace
 fi
 
+# NOTE: this env var is used by kind tool
+export KIND_CLUSTER_NAME=k8s
 NODE_ID_TO_ASSIGN=0x11
 ENDPOINT_ID=1
 
@@ -40,6 +42,14 @@ function _wait_chip_apps {
 # Provision Lighting Application service
 sudo docker-compose up -d
 trap 'sudo docker-compose down' EXIT
+
+# Provision a K8s cluster
+if ! sudo "$(command -v kind)" get clusters | grep -e "$KIND_CLUSTER_NAME"; then
+    sudo -E kind create cluster
+    mkdir -p "$HOME/.kube"
+    sudo chown -R "$USER": "$HOME/.kube"
+    sudo -E kind get kubeconfig | tee "$HOME/.kube/config"
+fi
 _wait_chip_apps
 
 # Download keadm
@@ -63,4 +73,8 @@ _exec_chip_tool onoff off "${NODE_ID_TO_ASSIGN}" "${ENDPOINT_ID}"
 # Forget the commissioned device
 _exec_chip_tool pairing unpair "${NODE_ID_TO_ASSIGN}"
 
+# Wait for node readiness
+for node in $(kubectl get node -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'); do
+    kubectl wait --for=condition=ready "node/$node" --timeout=3m
+done
 sudo docker-compose logs

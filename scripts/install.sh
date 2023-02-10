@@ -18,4 +18,4 @@ fi
 
 # Install dependencies
 # NOTE: Shorten link -> https://github.com/electrocucaracha/pkg-mgr_scripts
-curl -fsSL http://bit.ly/install_pkg | PKG_COMMANDS_LIST="docker,docker-compose" bash
+curl -fsSL http://bit.ly/install_pkg | PKG_COMMANDS_LIST="docker,docker-compose,kind,kubectl" bash
