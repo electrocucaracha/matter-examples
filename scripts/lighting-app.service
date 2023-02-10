@@ -1,0 +1,9 @@
+[Unit]
+Description=Lighting Matter demo app
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/chip-lighting-app
+
+[Install]
+WantedBy=multi-user.target

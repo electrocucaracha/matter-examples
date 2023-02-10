@@ -42,11 +42,16 @@ CMD ["/usr/local/bin/chip-tool"]
 
 FROM ubuntu:22.04 as chip-lighting-app
 
+COPY --from=builder /tmp/lighting-app /usr/local/bin/
+COPY lighting-app.service /etc/systemd/system/
+ADD https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/v1.5.4505/files/docker/systemctl3.py /usr/bin/systemctl
+
 RUN apt-get update && apt-get install -y -qq --no-install-recommends \
   libssl-dev=3.0.2-0ubuntu1.8 \
   libdbus-1-dev=1.12.20-2ubuntu4.1 \
-  && rm -rf /var/lib/apt/lists/*
+  python3=3.10.6-1~22.04 \
+  && rm -rf /var/lib/apt/lists/* \
+  && chmod +x /usr/bin/systemctl \
+  && systemctl enable lighting-app
 
-COPY --from=builder /tmp/lighting-app /usr/local/bin/
-
-CMD ["/usr/local/bin/chip-lighting-app"]
+CMD ["/usr/bin/systemctl"]
