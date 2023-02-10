@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y -qq --no-install-recommends \
   libgirepository1.0-dev=1.72.0-1 \
   libcairo2-dev=1.16.0-5ubuntu2 \
   libreadline-dev=8.1.2-1 \
+  wget=1.21.2-2ubuntu1 \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
@@ -28,6 +29,8 @@ RUN git clone --depth 1 https://github.com/project-chip/connectedhomeip.git --br
 WORKDIR /opt/connectedhomeip/scripts/examples/
 RUN ./gn_build_example.sh ../../examples/chip-tool /tmp/chip-tool/ \
   && ./gn_build_example.sh ../../examples/lighting-app/linux /tmp/lighting-app/
+
+RUN wget -q https://github.com/kubeedge/kubeedge/releases/download/v1.13.0/keadm-v1.13.0-linux-amd64.tar.gz -O - | tar -xz --strip-components=2 -C /tmp
 
 FROM ubuntu:22.04 as chip-tool
 
@@ -43,6 +46,7 @@ CMD ["/usr/local/bin/chip-tool"]
 FROM ubuntu:22.04 as chip-lighting-app
 
 COPY --from=builder /tmp/lighting-app /usr/local/bin/
+COPY --from=builder /tmp/keadm /usr/local/bin/
 COPY lighting-app.service /etc/systemd/system/
 ADD https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/v1.5.4505/files/docker/systemctl3.py /usr/bin/systemctl
 

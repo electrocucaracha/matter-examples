@@ -15,6 +15,9 @@ if [[ ${DEBUG:-false} == "true" ]]; then
     set -o xtrace
 fi
 
+NODE_ID_TO_ASSIGN=0x11
+ENDPOINT_ID=1
+
 function _exec_chip_tool {
     sudo docker exec "$(sudo docker ps --filter 'name=.*cli' -q)" /usr/local/bin/chip-tool "$@"
 }
@@ -34,12 +37,17 @@ function _wait_chip_apps {
     done
 }
 
+# Provision Lighting Application service
 sudo docker-compose up -d
 trap 'sudo docker-compose down' EXIT
 _wait_chip_apps
 
-NODE_ID_TO_ASSIGN=0x11
-ENDPOINT_ID=1
+# Download keadm
+if ! command -v keadm >/dev/null; then
+    container_id=$(sudo docker ps | grep "lighting-app" | awk '{print $1}')
+    sudo docker cp "$container_id:/usr/local/bin/keadm" /usr/local/bin/keadm
+    keadm completion bash | sudo tee /etc/bash_completion.d/kind >/dev/null
+fi
 
 # Commissioning:
 # Discover devices with long discriminator 3840 and try to pair with the first
